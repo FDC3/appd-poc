@@ -1,0 +1,259 @@
+swagger: '2.0'
+info:
+  version: '0.0.1'
+  title: Application Directory specification demonstration
+  description: |
+    Application Directory specification (demo) providing both interface definition and objects necessary to construct an application directory service.
+tags:
+  - Application
+produces:
+  - application/json
+schemes:
+  - http
+  - https
+basePath: '/appd'
+paths:
+  '/v1/apps/{appId}':
+    get:
+      summary: Retrieve an application defintion
+      parameters:
+      - name: "appId"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Application'
+        '400':
+          description: 'Bad request.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+        '403':
+          description: 'Forbidden: Certificate authentication is not allowed for the requested user.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+        '500':
+          description: 'Server error, see response body for further details.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+      tags:
+        - Application
+definitions:
+  ErrorDTO:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+  Application:
+    description: |
+      Defines an application retrieved from an FDC3 App Directory, which can then be launched.
+      Launching typically means running for a user on a desktop, but the concepts around laucnhing including
+      who or what might do it, and how the launch action is initiated are discussed elsewhere in the FDC3 App Directory spec.
+    required:
+      - name
+      - appType
+      - appDetails
+    properties:
+      name:
+        type: string
+        description: |
+          The name of the application.
+          The name should be unique within an FDC3 App Directory instance. The exception to the uniqueness constraint is that an App Directory can hold definitions for
+          multiple versions of the same app.
+          The same appName could occur in other directories. We are not currently specifying app name conventions in the document.
+
+      appType:
+        type: string
+        description: |
+          The type of the application. There should be predefined values, the different application types would also have different data fields.
+          Custom values will also be allowed to enable the use of in-house or 3rd party specific values such as layouts to be specified.
+          Launchers are expected to ignore applications of a custom type that they do not support.
+          The standard values proposed are
+          - DesktopExe. Some executable on the desktop. The detailed definitions could allow for Windows and Mac. This would mainly be used for specifying in-house applications
+          developed using .Net.
+          - Container. A Web Application detined to run in a container. The Container application type coud include meta data for the various container types that an
+          application vendor may support.
+          - Custom.{Vendor}.{CustomAppType}. Additional private application types can be specified. It reuqires co-ordination between the  launcher and the App Directory instances to
+          allow these values to be used. An example would be to allow Desktop Layouts to be specified in an in-house App Directory Instance
+
+      version:
+        type: string
+        description: Version of the application. This allows multiple app versions to be defined using the same app name. This can be a triplet but can also include things like 1.2.5 (BETA)
+
+      title:
+        type: string
+        description: Optional title for the application, if missing use appName, typically used in a launcher UI.
+
+      tooltip:
+        type: string
+        description: Optional tooltip description e.g. for a launcher
+
+      description:
+        type: string
+        description: Description of the application. This will typically be a 1-2 paragraph style blurb about the application. Allow mark up langua
+
+      images:
+        type: array
+        description: Array of images to show the user when they are looking at app descritpion. Each image can have an optional description/tooltip
+        items:
+          $ref: '#/definitions/AppImage'
+
+      contactEmail:
+        type: string
+        description: Optional e-mail to receive queries about the application
+
+      supportEmail:
+        type: string
+        description: Optional e-mail to receive support requests for the application
+
+      publisher:
+        type: string
+        description:  The name of the company that owns the application. The publisher has control over their namespace/app/signature(see diagram).
+
+      icons:
+        type: array
+        description: Holds Icons used for the application, a Launcher may be able to use multiple Icon sizes or there may be a 'button' Icon
+        items:
+          $ref: '#/definitions/Icon'
+
+      customConfig:
+        type: array
+        description: An optional set of name value pairs that can be used to deliver custom data from an App Directroy to a launcher.
+        items:
+          $ref: '#/definitions/NameValuePair'
+
+      intents:
+        type: array
+        description: |
+          The list of intents implemented by the Application.
+
+          NB The usage and meaning of Intents is still under discussion in the Intent WG (as of 27-Jun-18). See the comment on '#/definitions/Intent' for details.
+          I think the essence of the 'debate' is around how closely the terminology should match that used in Android.
+          I believe that in Android this intents field (within the Application definition) would be called actions and would effectively hold an Intent name and a Context,
+          where a context is an object type like Contact or Symbol.Equity that serves as a restriction on where the Intent/Action is valid.
+          However the current Intent definition can hold a Context so the split between action and intent is not strictly necessary.
+        items:
+          $ref: '#/definitions/Intent'
+      appDetails:
+        description: Depending on appType, expect to see one of the following for the app details
+        $ref: '#/definitions/AppType'
+  AppExe:
+    allOf:
+      - $ref: '#/definitions/AppType'
+    required:
+        - exePath
+    description: Holds data for an appType=Exe
+    properties:
+      exePath:
+        type: string
+        description: URI to the application, expect to use FILE style URI
+      allowMultiple:
+        type: boolean
+        description: SHould a launcher create a new instance or try and focus an existing instance
+  AppBrowser:
+    allOf:
+      - $ref: '#/definitions/AppType'
+    required:
+      - url
+    description: Holds data for an appType=Browser. It is up to the Launcher to select which Browser to use, typically this will be the default desktop browser.
+    properties:
+      url:
+        type: string
+        description: The URL to display in a browser window.
+      config:
+        type: array
+        description: optional set of Config values for displaying the browser, for example select a Kiosk mode. Values need to be 'agreed' between Launcher and App Directrory.
+        items:
+          $ref: '#/definitions/NameValuePair'
+  AppContainer:
+    allOf:
+      - $ref: '#/definitions/AppType'
+    required:
+      - manifests
+    description: Holds data for an appType=Container
+    properties:
+      url:
+        type: string
+        description: |
+          The initial URL of the application. This may need to be repeated in the container specific manifest.
+          We would recommend that Manifests can reference this URL via macros
+      signature:
+        type: string
+        description: The domain or public key that the application lives under. For example, the manifest_url would not be able to live under cdn.openfin2.co. Public Key would be a 1:1 ratio to an application but you can have many applications under a domain. Only required if app type is container.
+      manifests:
+        type: array
+        description: |
+          List of Container specific manifests for the application.
+          Maybe allow a short cut to just have a single manifest for sites with only a single container.
+          The discriminated list is of more use for companies offering an application supported in multiple containers.
+        items:
+          $ref: '#/definitions/ContainerManifest'
+  AppCustom:
+    allOf:
+      - $ref: '#/definitions/AppType'
+    description: Holds data for any other app type, it is assumed that the launcher and app directory will have agreed values to store here, outside the scope of FDC3
+    properties:
+      config:
+        type: array
+        description: The set of custom data, I prefer to give this as a list of name/value pairs with the value typically being a JSon object rather than a single value.
+        items:
+          $ref: '#/definitions/NameValuePair'
+  ContainerManifest:
+    required:
+      - containerType
+      - manifest
+    properties:
+      containerType:
+        type: string
+        description: |
+          name of the Container, agreed between container vendor and launcher.
+          Should we allow companies to register standard container names like OpenFin, Autobahn or Glue42
+      manifest:
+        type: string
+        description: |
+          The application manifest for the chosen container type.
+          Should we allow companies to register standard container names like OpenFin or Glue42
+  AppType:
+    type: object
+    discriminator: aType
+    required:
+      - name
+      - aType
+    properties:
+      name:
+        type: string
+      aType:
+        type: string
+  NameValuePair:
+    description: Simple name value pair
+    properties:
+      name:
+        type: string
+        description: name
+      value:
+        type: string
+        description: value
+  Icon:
+    description: Icon holder
+    properties:
+      icon:
+        type: string
+        description: Icon URL
+  AppImage:
+    description: App Image holder
+    properties:
+      url:
+        type: string
+        description: App Image URL
+  Intent:
+    description: Intent name
+    properties:
+      name:
+        type: string
+        description: Intent name
