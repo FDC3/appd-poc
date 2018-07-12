@@ -21,6 +21,7 @@ package org.fdc3.appd.poc;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.fdc3.appd.poc.exceptions.DaoException;
 import org.fdc3.appd.server.api.NotFoundException;
 import org.fdc3.appd.server.api.V1ApiService;
 import org.fdc3.appd.server.model.Application;

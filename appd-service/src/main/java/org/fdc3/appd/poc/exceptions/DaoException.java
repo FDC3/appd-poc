@@ -16,7 +16,7 @@
  *  from IHS Markit.
  */
 
-package org.fdc3.appd.poc;
+package org.fdc3.appd.poc.exceptions;
 
 /**
  * @author Frank Tarsillo on 7/30/17.

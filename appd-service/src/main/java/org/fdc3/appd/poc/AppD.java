@@ -21,12 +21,15 @@ package org.fdc3.appd.poc;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.fdc3.appd.poc.config.ConfigId;
+import org.fdc3.appd.poc.config.Configuration;
 
 /**
  * @author Frank Tarsillo on 7/5/18.
  */
 public class AppD  {
 
+    Configuration configuration = Configuration.get();
 
     public AppD() {
 
@@ -45,7 +48,7 @@ public class AppD  {
 
 
         WebAppContext webapp = new WebAppContext();
-        webapp.setWar("appd-service/target/appd-service-0.0.1-SNAPSHOT.war");
+        webapp.setWar( configuration.get(ConfigId.WAR_FILE,"appd-service/target/appd-service.war"));
         server.setHandler(webapp);
 
         try {
