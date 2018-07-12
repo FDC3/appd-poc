@@ -48,6 +48,7 @@ Build:
 ## Run it in Docker!
 
     # clone..*
+    # cd cloned_directory
     # mvn clean install package
     # cd appd-service
     # docker build . --tag=appd-service
