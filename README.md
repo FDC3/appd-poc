@@ -44,3 +44,14 @@ Build:
     The POC application directory service which implements the server stubs and exposes the interfaces.
     For the time being it will store all application data on local disk in JSON format.
 
+
+## Run it in Docker!
+
+    # clone..*
+    # mvn clean install package
+    # cd appd-service
+    # docker build . --tag=appd-service
+    # docker run -p 8080:8080 appd-service
+
+    # curl http://localhost:8080/appd/v1/apps/search
+    {"applications":[{"appId":"353527c7-f765-452b-a5d4-a1ecaa0854f7","name":"TEST IT","appType":"string","version":"string","title":"string","tooltip":"string","description":"string","images":[{"url":"string"}],"contactEmail":"string","supportEmail":"string","publisher":"string","icons":[{"icon":"string"}],"customConfig":[{"name":"string","value":"string"}],"intents":[{"name":"string"}],"appDetails":{"name":"string","aType":"string"}}],"message":"OK"}
