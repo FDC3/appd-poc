@@ -226,7 +226,6 @@
 
 
     <modules>
-        <module>appd-api</module>
         <module>appd-service</module>
     </modules>
 </project>
