@@ -1,5 +1,8 @@
 # Application Directory POC
 
+**This is NOT a ratified specification but rather a tool to evaluate both the use cases and technology implmentations.**
+
+
 ## Overview
 This project is a POC focused on creation of an Application Directory service as defined through initial proposals and
 ongoing discussions in the Application Directory FDC3 working group.  The purpose of this POC is to:
@@ -9,7 +12,6 @@ ongoing discussions in the Application Directory FDC3 working group.  The purpos
 * Generate example server stubs for java and nodejs
 * Generate example client binding for java
 
-This is NOT a ratified specification but rather a tool to evaluate both the use cases and technology implmentations.
 
 
 ## Build

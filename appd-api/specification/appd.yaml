@@ -1,8 +1,9 @@
 swagger: '2.0'
 info:
   version: '0.0.1'
-  title: Application Directory specification demonstration
+  title: NOT RATIFIED - Application Directory specification
   description: |
+    --This is NOT a ratified FDC3 specification--
     Application Directory specification (demo) providing both interface definition and objects necessary to construct an application directory service.
 schemes:
   - http

@@ -54,6 +54,7 @@ public class AppDirectoryService extends V1ApiService {
 
             Application application = appsDao.getApp(appId);
 
+
             jo.add("application", gson.toJsonTree(application));
             jo.addProperty("message", "OK");
 
