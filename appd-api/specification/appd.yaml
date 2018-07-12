@@ -4,10 +4,6 @@ info:
   title: Application Directory specification demonstration
   description: |
     Application Directory specification (demo) providing both interface definition and objects necessary to construct an application directory service.
-tags:
-  - Application
-produces:
-  - application/json
 schemes:
   - http
   - https
@@ -20,13 +16,68 @@ paths:
       - name: "appId"
         in: "path"
         required: true
-        type: "integer"
-        format: "int64"
+        type: "string"
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Application'
+            $ref: '#/definitions/ApplicationSearchResponse'
+        '400':
+          description: 'Bad request.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+        '403':
+          description: 'Forbidden: Certificate authentication is not allowed for the requested user.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+        '500':
+          description: 'Server error, see response body for further details.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+      tags:
+        - Application
+  '/v1/apps':
+    post:
+      summary: Create a new application definition
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: application
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Application'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ApplicationSearchResponse'
+        '400':
+          description: 'Bad request.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+        '403':
+          description: 'Forbidden: Certificate authentication is not allowed for the requested user.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+        '500':
+          description: 'Server error, see response body for further details.'
+          schema:
+            $ref: '#/definitions/ErrorDTO'
+      tags:
+        - Application
+  '/v1/apps/search':
+    get:
+      summary: Retrieve a list of applications
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ApplicationSearchResponse'
         '400':
           description: 'Bad request.'
           schema:
@@ -56,10 +107,16 @@ definitions:
       Launching typically means running for a user on a desktop, but the concepts around laucnhing including
       who or what might do it, and how the launch action is initiated are discussed elsewhere in the FDC3 App Directory spec.
     required:
+      - appId
       - name
       - appType
       - appDetails
     properties:
+      appId:
+        type: string
+        description: |
+          The unique application identifier within located within a specific applicationd directory instance.
+
       name:
         type: string
         description: |
@@ -219,6 +276,18 @@ definitions:
         description: |
           The application manifest for the chosen container type.
           Should we allow companies to register standard container names like OpenFin or Glue42
+  ApplicationSearchResponse:
+    properties:
+      applications:
+        type: array
+        description: |
+          List of applications
+        items:
+          $ref: '#/definitions/Application'
+      message:
+        type: string
+        description: |
+         Response message providing status of query
   AppType:
     type: object
     discriminator: aType

@@ -18,24 +18,102 @@
 
 package org.fdc3.appd.poc;
 
-import org.fdc3.appd.server.api.ApiResponseMessage;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.fdc3.appd.server.api.NotFoundException;
 import org.fdc3.appd.server.api.V1ApiService;
+import org.fdc3.appd.server.model.Application;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Frank Tarsillo on 7/5/18.
  */
 public class AppDirectoryService extends V1ApiService {
 
-    @Override
-    public Response v1AppsAppIdGet(Long appId , SecurityContext securityContext) throws NotFoundException {
+    private AppsDao appsDao = AppsDao.get();
 
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "MyTest")).build();
+    private Logger logger = LoggerFactory.getLogger(AppDirectoryService.class);
+
+    @Override
+    public Response v1AppsAppIdGet(String appId, SecurityContext securityContext) throws NotFoundException {
+
+
+        JsonObject jo = new JsonObject();
+        Response.Status status = Response.Status.OK;
+        Gson gson = new GsonBuilder().create();
+
+        try {
+
+            Application application = appsDao.getApp(appId);
+
+            jo.add("application", gson.toJsonTree(application));
+            jo.addProperty("message", "OK");
+
+        } catch (DaoException e) {
+            e.printStackTrace();
+            jo.addProperty("message", "application record not found");
+            status = Response.Status.NOT_FOUND;
+
+        }
+
+        return Response.ok().entity(jo.toString()).status(status).build();
     }
 
+
+    @Override
+    public Response v1AppsPost(Application application, SecurityContext securityContext) throws NotFoundException {
+
+        JsonObject jo = new JsonObject();
+        Response.Status status = Response.Status.OK;
+        Gson gson = new GsonBuilder().create();
+
+        try {
+
+            if (application == null)
+                throw new DaoException("Application not provided");
+
+
+            appsDao.setApp(application);
+
+            jo.add("application", gson.toJsonTree(application));
+            jo.addProperty("message", "OK");
+
+
+        } catch (DaoException e) {
+            e.printStackTrace();
+            jo.addProperty("message", "application not added or modified, make sure to provide an Applicaiton model");
+            status = Response.Status.NOT_MODIFIED;
+
+
+        }
+
+        return Response.ok().entity(jo.toString()).status(status).build();
+    }
+
+    @Override
+    public Response v1AppsSearchGet(SecurityContext securityContext) throws NotFoundException {
+
+        JsonObject jo = new JsonObject();
+        Response.Status status = Response.Status.OK;
+        Gson gson = new GsonBuilder().create();
+
+
+        List<Application> applications = new ArrayList<>(appsDao.getApps().values());
+
+        jo.add("applications", gson.toJsonTree(applications));
+        jo.addProperty("message", "OK");
+
+
+        return Response.ok().entity(jo.toString()).status(status).build();
+
+    }
 
 
 }
