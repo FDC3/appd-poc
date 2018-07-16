@@ -23,13 +23,26 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.fdc3.appd.poc.config.ConfigId;
 import org.fdc3.appd.poc.config.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * AppD stands for Application Directory
+ *
+ * This is a reference implementation of the Application Directory specification which services the defined interfaces
+ * and models.  This is intended to be a simple POC of a service to help establish the specification itself and should
+ * not be used as a production capability.
+ *
+ * AppD initialization
+ *      Run embedded Jetty server...
+ *
+ *
  * @author Frank Tarsillo on 7/5/18.
  */
-public class AppD  {
+public class AppD {
 
-    Configuration configuration = Configuration.get();
+    private Configuration configuration = Configuration.get();
+    private Logger logger = LoggerFactory.getLogger(AppD.class);
 
     public AppD() {
 
@@ -43,33 +56,28 @@ public class AppD  {
     }
 
 
-    void init(){
+    /**
+     * Init the jetty embedded server and use the configured war
+     *
+     */
+    private void init() {
         Server server = new Server(8080);
 
 
         WebAppContext webapp = new WebAppContext();
-        webapp.setWar( configuration.get(ConfigId.WAR_FILE,"appd-service/target/appd-service.war"));
+        webapp.setWar(configuration.get(ConfigId.WAR_FILE, "lib/appd-service.war"));
         server.setHandler(webapp);
 
+
         try {
-
-            try {
-                System.out.println("Starting server");
-                server.start();
-            }catch(IllegalStateException e){
-
-             e.printStackTrace();
-            }
-
-
+            logger.info("Starting Application Directory service....");
+            server.start();
             server.join();
-
-
         } catch (Exception e) {
 
-            e.printStackTrace();
-
+            logger.error("Failed to start service..", e);
         }
+
     }
 
 }

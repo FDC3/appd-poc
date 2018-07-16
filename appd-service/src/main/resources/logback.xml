@@ -108,9 +108,6 @@
 
 
 
-
-
-
     <!-- Send logs to both console and file audit -->
     <logger name="org.eclipse.jetty" level="info"
             additivity="false">

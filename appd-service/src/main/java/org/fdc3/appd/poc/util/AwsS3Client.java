@@ -16,7 +16,7 @@
  *  from IHS Markit.
  */
 
-package org.fdc3.appd.poc;
+package org.fdc3.appd.poc.util;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -55,8 +55,7 @@ public class AwsS3Client {
     public AwsS3Client() {
 
         AWSCredentials credentials = new BasicAWSCredentials(config.get(ConfigId.S3_KEY_ID), config.get(ConfigId.S3_ACCESS_KEY));
-        s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
-
+        s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.fromName(config.get(ConfigId.S3_REGION, "us-east-1"))).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
 
     }
 
@@ -118,14 +117,12 @@ public class AwsS3Client {
 
     public InputStream getObject(S3ObjectSummary objectSummary) {
 
-        S3Object object=null;
+        S3Object object = null;
 
         try {
             logger.debug("Retrieving object inputstream for s3://{}/{}", objectSummary.getBucketName(), objectSummary.getKey());
             object = s3Client.getObject(
                     new GetObjectRequest(objectSummary.getBucketName(), objectSummary.getKey()));
-
-
 
 
         } catch (AmazonServiceException ase) {
@@ -157,7 +154,7 @@ public class AwsS3Client {
             logger.info("Put object for s3://{}/{}", destBucket, key);
             byte[] bytes = IOUtils.toByteArray(inputStream);
 
-            if(metaData==null)
+            if (metaData == null)
                 metaData = new ObjectMetadata();
 
             metaData.setContentLength(bytes.length);
@@ -184,7 +181,7 @@ public class AwsS3Client {
                     " with S3, " +
                     "such as not being able to access the network.");
             logger.error("Error Message: " + ace.getMessage());
-        }catch (IOException e) {
+        } catch (IOException e) {
             logger.error("Obtaining length", e);
         }
 
@@ -229,13 +226,12 @@ public class AwsS3Client {
     }
 
 
-
     public void deleteObject(String bucketName, String destKey) {
         try {
 
             logger.debug("Deleting S3 objects for s3://{}/{}", bucketName, destKey);
 
-            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucketName,destKey);
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucketName, destKey);
 
             s3Client.deleteObject(deleteObjectRequest);
         } catch (AmazonServiceException ase) {
@@ -258,8 +254,6 @@ public class AwsS3Client {
             logger.error("Error Message: " + ace.getMessage());
         }
     }
-
-
 
 
     private void displayTextInputStream(InputStream input)

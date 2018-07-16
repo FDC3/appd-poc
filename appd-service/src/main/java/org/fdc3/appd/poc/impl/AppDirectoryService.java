@@ -16,11 +16,12 @@
  *  from IHS Markit.
  */
 
-package org.fdc3.appd.poc;
+package org.fdc3.appd.poc.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.fdc3.appd.poc.dao.AppsDao;
 import org.fdc3.appd.poc.exceptions.DaoException;
 import org.fdc3.appd.server.api.NotFoundException;
 import org.fdc3.appd.server.api.V1ApiService;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The AppD directory
  * @author Frank Tarsillo on 7/5/18.
  */
 public class AppDirectoryService extends V1ApiService {

@@ -98,6 +98,12 @@ public class Configuration {
         return (value == null) ? defaultValue : value;
     }
 
+    public boolean getBoolean(ConfigId id, boolean  defaultValue) {
+        String value = get(id);
+
+        return (value == null) ? defaultValue : Boolean.getBoolean(value);
+    }
+
     public String getRequired(ConfigId id) {
         String value = get(id);
 
