@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AppD {
 
-    private Configuration configuration = Configuration.get();
+    private Configuration config = Configuration.get();
     private Logger logger = LoggerFactory.getLogger(AppD.class);
 
     public AppD() {
@@ -61,11 +61,11 @@ public class AppD {
      *
      */
     private void init() {
-        Server server = new Server(8080);
+        Server server = new Server(config.getInt(ConfigId.HTTP_PORT, 8080));
 
 
         WebAppContext webapp = new WebAppContext();
-        webapp.setWar(configuration.get(ConfigId.WAR_FILE, "lib/appd-service.war"));
+        webapp.setWar(config.get(ConfigId.WAR_FILE, "lib/appd-service.war"));
         server.setHandler(webapp);
 
 
