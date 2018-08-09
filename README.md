@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/FDC3/appd-poc.svg)](https://travis-ci.org/FDC3/appd-poc/)
 # Application Directory POC
 
 **This is NOT a ratified specification but rather a tool to evaluate both the use cases and technology implmentations.**

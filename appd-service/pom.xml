@@ -42,6 +42,9 @@
         <build_version>${project.version}</build_version>
         <build_number>00001</build_number>
         <version.war.plugin>2.5</version.war.plugin>
+        <identity.version>1.2.0</identity.version>
+        <nimbus.version>6.0</nimbus.version>
+
 
 
     </properties>
@@ -52,6 +55,11 @@
             <groupId>org.fdc3.appd</groupId>
             <artifactId>appd-java-server-stubs</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbus.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

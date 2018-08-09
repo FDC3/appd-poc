@@ -28,14 +28,14 @@ import org.fdc3.appd.server.api.V1ApiService;
 import org.fdc3.appd.server.model.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The AppD directory
+ * The AppD directory delegate for core interface
+ *
  * @author Frank Tarsillo on 7/5/18.
  */
 public class AppDirectoryService extends V1ApiService {

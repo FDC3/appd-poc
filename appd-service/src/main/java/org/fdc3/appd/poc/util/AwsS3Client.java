@@ -52,11 +52,20 @@ public class AwsS3Client {
     private Logger logger = LoggerFactory.getLogger(AwsS3Client.class);
     private Configuration config = Configuration.get();
 
+
     public AwsS3Client() {
+        AWSCredentials credentials = null;
 
-        AWSCredentials credentials = new BasicAWSCredentials(config.get(ConfigId.S3_KEY_ID), config.get(ConfigId.S3_ACCESS_KEY));
-        s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.fromName(config.get(ConfigId.S3_REGION, "us-east-1"))).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
 
+        if (config.get(ConfigId.S3_KEY_ID) != null && config.get(ConfigId.S3_ACCESS_KEY) != null)
+            credentials = new BasicAWSCredentials(config.get(ConfigId.S3_KEY_ID), config.get(ConfigId.S3_ACCESS_KEY));
+
+
+        if (credentials != null) {
+            s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.fromName(config.get(ConfigId.S3_REGION, "us-east-1"))).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+        } else {
+            s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.fromName(config.get(ConfigId.S3_REGION, "us-east-1"))).build();
+        }
     }
 
     public static void main(String[] args) {
@@ -75,6 +84,8 @@ public class AwsS3Client {
 
         try {
             logger.debug("Listing S3 objects for s3://{}/{}", bucketName, prefix);
+
+
             final ListObjectsV2Request req = new ListObjectsV2Request().withBucketName(bucketName).withPrefix(prefix);
 
             ListObjectsV2Result result;

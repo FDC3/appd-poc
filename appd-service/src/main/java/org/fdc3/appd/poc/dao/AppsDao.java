@@ -18,6 +18,7 @@
 
 package org.fdc3.appd.poc.dao;
 
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.gson.Gson;
 import org.fdc3.appd.poc.config.ConfigId;
 import org.fdc3.appd.poc.config.Configuration;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -130,25 +132,21 @@ public class AppsDao {
      */
     private void prime() {
 
-        if (config.getBoolean(ConfigId.S3_ENABLED, false)) {
 
+        if (config.getBoolean(ConfigId.S3_ENABLED, false))
             primeFromS3();
 
-        } else {
-
-            try {
-                primeFromFiles();
-            } catch (DaoException e) {
-                logger.error("Could not load ");
-            }
-
+        try {
+            primeFromFiles();
+        }catch (DaoException e) {
+            logger.error("Could not load files from file cache");
         }
 
 
     }
 
     /**
-     * Prime cache from files (json)
+     * Prime cache from local files (json)
      *
      * @throws DaoException Exception from reading files into cache
      */
@@ -199,6 +197,27 @@ public class AppsDao {
      */
     private void primeFromS3() {
 
+        AwsS3Client awsS3Client = new AwsS3Client();
+
+
+        Gson gson = new Gson();
+
+        logger.debug("Attempting to load cache from S3 [{}/{}]", config.get(ConfigId.S3_BUCKET), config.get(ConfigId.S3_JSON_PREFIX));
+        List<S3ObjectSummary> allObjects = awsS3Client.getAllObjects(config.get(ConfigId.S3_BUCKET, ""), config.get(ConfigId.S3_JSON_PREFIX, "json"));
+
+        if (allObjects != null) {
+            for (S3ObjectSummary objectSummary : allObjects) {
+
+                if (!objectSummary.getKey().contains(".json"))
+                    continue;
+
+                Application application = gson.fromJson(new InputStreamReader(awsS3Client.getObject(objectSummary)), Application.class);
+                apps.put(application.getAppId(), application);
+
+
+            }
+        }
+
 
     }
 
@@ -233,7 +252,7 @@ public class AppsDao {
                 AwsS3Client awsS3Client = new AwsS3Client();
                 awsS3Client.putObject(
                         config.get(ConfigId.S3_BUCKET, ""),
-                        config.get(ConfigId.S3_JSON_PREFIX, "") + fileName,
+                        Paths.get(config.get(ConfigId.S3_JSON_PREFIX, ""),fileName).toString(),
                         new ByteArrayInputStream(gson.toJson(application).getBytes(StandardCharsets.UTF_8)),
                         null);
 

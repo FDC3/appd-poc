@@ -101,7 +101,7 @@ public class Configuration {
     public boolean getBoolean(ConfigId id, boolean  defaultValue) {
         String value = get(id);
 
-        return (value == null) ? defaultValue : Boolean.getBoolean(value);
+        return (value == null) ? defaultValue : Boolean.valueOf(value);
     }
 
     public String getRequired(ConfigId id) {
