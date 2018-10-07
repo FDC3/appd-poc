@@ -1,0 +1,27 @@
+#!/bin/sh -x
+
+mvn clean install package
+
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+
+apt-get update && apt-get install docker-ce
+docker --version
+
+
+cd appd-service
+
+docker build --tag appd-poc:master -f Dockerfile .
+
+apt-get update && apt-get -y install python curl unzip && cd /tmp && curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && unzip awscli-bundle.zip && ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && rm awscli-bundle.zip && rm -rf awscli-bundle
+
+aws --version
+
+eval $(aws ecr get-login --include-email --region us-east-1)
+
+docker tag appd-poc:master 101663181665.dkr.ecr.us-east-1.amazonaws.com/appd-poc:master
+docker push 101663181665.dkr.ecr.us-east-1.amazonaws.com/appd-poc:master
+
+#aws ecs update-service --cluster izzy-d1 --service izzy-d1-service --force-new-deployment --region us-east-1
