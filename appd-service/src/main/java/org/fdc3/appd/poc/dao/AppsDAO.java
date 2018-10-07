@@ -42,16 +42,16 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author Frank Tarsillo on 7/9/18.
  */
-public class AppsDao {
+public class AppsDAO {
 
-    private static AppsDao self;
+    private static AppsDAO self;
     private ConcurrentMap<String, Application> apps = new ConcurrentHashMap<>();
     private Configuration config = Configuration.get();
 
-    private Logger logger = LoggerFactory.getLogger(AppsDao.class);
+    private Logger logger = LoggerFactory.getLogger(AppsDAO.class);
 
 
-    public AppsDao() {
+    public AppsDAO() {
     }
 
 
@@ -60,10 +60,10 @@ public class AppsDao {
      *
      * @return instance
      */
-    public static AppsDao get() {
+    public static AppsDAO get() {
 
         if (self == null) {
-            self = new AppsDao();
+            self = new AppsDAO();
             self.prime();
         }
 

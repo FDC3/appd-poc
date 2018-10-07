@@ -21,7 +21,7 @@ package org.fdc3.appd.poc.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.fdc3.appd.poc.dao.AppsDao;
+import org.fdc3.appd.poc.dao.AppsDAO;
 import org.fdc3.appd.poc.exceptions.DaoException;
 import org.fdc3.appd.server.api.NotFoundException;
 import org.fdc3.appd.server.api.V1ApiService;
@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class AppDirectoryService extends V1ApiService {
 
-    private AppsDao appsDao = AppsDao.get();
+    private AppsDAO appsDao = AppsDAO.get();
 
     private Logger logger = LoggerFactory.getLogger(AppDirectoryService.class);
 
@@ -64,6 +64,7 @@ public class AppDirectoryService extends V1ApiService {
             e.printStackTrace();
             jo.addProperty("message", "application record not found");
             status = Response.Status.NOT_FOUND;
+
 
         }
 

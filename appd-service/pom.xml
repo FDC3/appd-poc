@@ -83,11 +83,17 @@
             <artifactId>jetty-continuation</artifactId>
             <version>${jetty-version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.amazonaws</groupId>-->
+            <!--<artifactId>aws-java-sdk</artifactId>-->
+            <!--<version>${aws-sdk-version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
+            <artifactId>aws-java-sdk-s3</artifactId>
             <version>${aws-sdk-version}</version>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>

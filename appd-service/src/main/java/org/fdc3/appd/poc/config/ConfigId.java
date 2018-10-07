@@ -34,6 +34,8 @@ public enum ConfigId {
     S3_BUCKET(false),
     S3_REGION(false),
     S3_JSON_PREFIX(false),
+    S3_JSON_APPS_PREFIX(false),
+    S3_JSON_USERS_PREFIX(false),
     HTTP_CONTEXT_PATH(false),
     HTTP_PORT(false);
 

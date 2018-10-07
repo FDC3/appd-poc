@@ -1,35 +1,19 @@
-/*
- *
- *
- *  Copyright (C) 2018 IHS Markit.
- *  All Rights Reserved
- *
- *
- *  NOTICE:  All information contained herein is, and remains
- *  the property of IHS Markit and its suppliers,
- *  if any.  The intellectual and technical concepts contained
- *  herein are proprietary to IHS Markit and its suppliers
- *  and may be covered by U.S. and Foreign Patents, patents in
- *  process, and are protected by trade secret or copyright law.
- *  Dissemination of this information or reproduction of this material
- *  is strictly forbidden unless prior written permission is obtained
- *  from IHS Markit.
- */
-
 package org.fdc3.appd.poc.filter;
 
-
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.fdc3.appd.poc.dao.UserDAO;
+import org.fdc3.appd.poc.dao.UserDAOFactory;
+import org.fdc3.appd.poc.exceptions.UserNotFoundException;
+import org.fdc3.appd.poc.model.User;
+import org.fdc3.appd.poc.model.UserSecurity;
+import org.fdc3.appd.poc.security.TokenSecurity;
+import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
@@ -37,21 +21,19 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
-
-
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
- * The AuthenticationFilter verifies the access permissions for a user based on the provided jwt token
+ * The AuthenticationFilter verifies the access permissions for a user based on the provided jwt token 
  * and role annotations
  **/
 @Provider
 @Priority( Priorities.AUTHENTICATION )
 public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequestFilter
 {
-
+    //final static Logger logger = Logger.getLogger( AuthenticationFilter.class );
     private Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
-
     @Context
     private ResourceInfo resourceInfo;
 
@@ -69,21 +51,23 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
         this.resourceInfo = resourceInfo;
     }
 
-    public AuthenticationFilter() {
-
-    }
 
     @Override
     public void filter( ContainerRequestContext requestContext )
     {
+        logger.debug("GOT HERE");
         Method method = resourceInfo.getResourceMethod();
         // everybody can access (e.g. user/create or user/authenticate)
         if( !method.isAnnotationPresent( PermitAll.class ) )
         {
+
+            logger.debug("IS NOT PERMITALL");
             // nobody can access
             if( method.isAnnotationPresent( DenyAll.class ) )
             {
-                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN.getStatusCode(),ACCESS_FORBIDDEN).build());
+                requestContext.abortWith(
+                        Response.status( Response.Status.FORBIDDEN).entity( ACCESS_FORBIDDEN ).build()
+                );
                 return;
             }
 
@@ -95,68 +79,68 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
             if( authProperty == null || authProperty.isEmpty() )
             {
                 logger.warn("No token provided!");
-            //    requestContext.abortWith(Response.status( Response.Status.UNAUTHORIZED.getStatusCode(), ACCESS_DENIED ).build() );
-           //     return;
+                requestContext.abortWith(
+                        Response.status( Response.Status.UNAUTHORIZED).entity(ACCESS_DENIED ).build()
+                );
+                return;
             }
 
-            String id = "user@company.com" ;
-//            String jwt = authProperty.get(0);
-//
-//            logger.debug("Authorization (x-access-token): {}", jwt);
+            String id = null ;
+            String jwt = authProperty.get(0);
 
-            //try to decode the jwt - deny access if no valid token provided
-//            try {
-//                id = TokenSecurity.validateJwtToken( jwt );
-//            } catch ( InvalidJwtException e ) {
-//                logger.warn("Invalid token provided!");
-//                requestContext.abortWith(
-//                        ResponseBuilder.createResponse( Response.Status.UNAUTHORIZED, ACCESS_INVALID_TOKEN )
-//                );
-//                return;
-//            }
+            // try to decode the jwt - deny access if no valid token provided
+            try {
+                id = TokenSecurity.validateJwtToken( jwt );
+            } catch ( InvalidJwtException e ) {
+                logger.warn("Invalid token provided!");
+                requestContext.abortWith(
+                        Response.status( Response.Status.UNAUTHORIZED).entity( ACCESS_INVALID_TOKEN ).build()
+                );
+                return;
+            }
 
             // check if token matches an user token (set in user/authenticate)
-//            UserDAO userDao = UserDAOFactory.getUserDAO();
-//            User user = null;
-//            try {
-//                user = userDao.getUser( id );
-//            }
-//            catch ( UserNotFoundException e ) {
-//                logger.warn("Token missmatch!");
-//                requestContext.abortWith(
-//                        ResponseBuilder.createResponse( Response.Status.UNAUTHORIZED, ACCESS_DENIED )
-//                );
-//                return;
-//            }
-//
-//            UserSecurity userSecurity = userDao.getUserAuthentication( user.getId() );
-//
-//            // token does not match with token stored in database - enforce re authentication
-//            if( !userSecurity.getToken().equals( jwt ) ) {
-//                logger.warn("Token expired!");
-//                requestContext.abortWith(
-//                        ResponseBuilder.createResponse( Response.Status.UNAUTHORIZED, ACCESS_REFRESH )
-//                );
-//                return;
-//            }
-//
-//            // verify user access from provided roles ("admin", "user", "guest")
-//            if( method.isAnnotationPresent( RolesAllowed.class ) )
-//            {
-//                // get annotated roles
-//                RolesAllowed rolesAnnotation = method.getAnnotation( RolesAllowed.class );
-//                Set<String> rolesSet = new HashSet<String>( Arrays.asList( rolesAnnotation.value() ) );
-//
-//                // user valid?
-//                if( !isUserAllowed( userSecurity.getRole(), rolesSet ) )
-//                {
-//                    logger.warn("User does not have the rights to acces this resource!");
-//                    requestContext.abortWith(
-//                            ResponseBuilder.createResponse( Response.Status.UNAUTHORIZED, ACCESS_DENIED )
-//                    );
-//                    return;
-//                }
-//            }
+            UserDAO userDao = UserDAOFactory.getUserDAO();
+            User user = null;
+            try {
+                user = userDao.getUser( id );
+            }
+            catch ( UserNotFoundException e ) {
+                logger.warn("Token missmatch!");
+                requestContext.abortWith(
+                        Response.status( Response.Status.UNAUTHORIZED).entity( ACCESS_DENIED ).build()
+                );
+                return;
+            }
+
+            UserSecurity userSecurity = userDao.getUserAuthentication( user.getId() );
+
+            // token does not match with token stored in database - enforce re authentication
+            if( !userSecurity.getToken().equals( jwt ) ) {
+                logger.warn("Token expired!");
+                requestContext.abortWith(
+                        Response.status( Response.Status.UNAUTHORIZED).entity( ACCESS_REFRESH ).build()
+                );
+                return;
+            }
+
+            // verify user access from provided roles ("admin", "user", "guest")
+            if( method.isAnnotationPresent( RolesAllowed.class ) )
+            {
+                // get annotated roles
+                RolesAllowed rolesAnnotation = method.getAnnotation( RolesAllowed.class );
+                Set<String> rolesSet = new HashSet<String>( Arrays.asList( rolesAnnotation.value() ) );
+
+                // user valid?
+                if( !isUserAllowed( userSecurity.getRole(), rolesSet ) )
+                {
+                    logger.warn("User does not have the rights to acces this resource!");
+                    requestContext.abortWith(
+                            Response.status( Response.Status.UNAUTHORIZED).entity( ACCESS_DENIED ).build()
+                    );
+                    return;
+                }
+            }
 
             // set header param email for user identification in rest service - do not decode jwt twice in rest services
             List<String> idList = new ArrayList<String>();
@@ -165,5 +149,15 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
         }
     }
 
+    private boolean isUserAllowed( final String userRole, final Set<String> rolesSet )
+    {
+        boolean isAllowed = false;
 
+        if( rolesSet.contains( userRole ) )
+        {
+            isAllowed = true;
+        }
+
+        return isAllowed;
+    }
 }

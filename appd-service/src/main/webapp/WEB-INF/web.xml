@@ -34,7 +34,8 @@
                 io.swagger.jaxrs.listing,
                 io.swagger.sample.resource,
                 org.fdc3.appd.server.api,
-                org.fdc3.appd.poc.config
+                org.fdc3.appd.poc.config,
+                org.fdc3.appd.poc.api
             </param-value>
         </init-param>
         <init-param>
@@ -49,33 +50,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!--<servlet>-->
-        <!--<servlet-name>Jersey2Config</servlet-name>-->
-        <!--<servlet-class>io.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>-->
-        <!--<init-param>-->
-            <!--<param-name>api.version</param-name>-->
-            <!--<param-value>1.0.0</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>swagger.api.title</param-name>-->
-            <!--<param-value>Swagger Server</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>swagger.api.basepath</param-name>-->
-            <!--<param-value>http://localhost/appd</param-value>-->
-        <!--</init-param>-->
-        <!--<init-param>-->
-            <!--<param-name>V1Api.implementation</param-name>-->
-            <!--<param-value>org.fdc3.appd.poc.impl.AppDirectoryService</param-value>-->
-        <!--</init-param>-->
-
-        <!--<load-on-startup>2</load-on-startup>-->
-    <!--</servlet>-->
-    <!--<servlet>-->
-        <!--<servlet-name>Bootstrap</servlet-name>-->
-        <!--<servlet-class>org.fdc3.appd.server.api.Bootstrap</servlet-class>-->
-        <!--<load-on-startup>2</load-on-startup>-->
-    <!--</servlet>-->
     <servlet-mapping>
         <servlet-name>AppD</servlet-name>
         <url-pattern>/appd/*</url-pattern>

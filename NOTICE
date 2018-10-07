@@ -1,0 +1,34 @@
+AppD-POD
+Copyright 2018 FINOS
+
+This product includes software developed at
+FINOS (http://finos.org).
+
+========================================================================
+Common Development and Distribution License 1.0
+========================================================================
+
+The following components are provided under the Common Development and Distribution License 1.0. See project link for details.
+
+     (CDDL 1.1-GPL2 w/ CPE) JAX-RS (javax.ws.rs.javax.ws.rs-api) (https://jax-rs-spec.java.net/)
+     (CDDL 1.0) (GPL2 w/ CPE) javax.annotation API (javax.annotation.*)
+     (CDDL + GPLv2 with classpath exception) Jersey (org.glassfish.jersey.*) - https://jersey.java.net/
+     (CDDL 1.1 + GPLv2 with classpath exception) HK2 (org.glassfish.hk2.*) - https://hk2.java.net
+
+ ========================================================================
+ Eclipse Public License 1.0
+ ========================================================================
+
+ The following components are provided under the Eclipse Public License 1.0. See project link for details.
+
+     (Eclipse Public License 1.0) Junit (junit.junit:4.12) - http://junit.org/junit4
+
+
+ ========================================================================
+ MIT License
+ ========================================================================
+ This project contains modified source from tutorial-academy.com examples related to directory services, JWT token creation
+ and validation.  It has been combined with this project to provide these services as part of a consolidated POC.
+
+ https://github.com/maltesander/rest-jersey2-json-jwt-authentication
+
