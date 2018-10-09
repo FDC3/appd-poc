@@ -18,6 +18,7 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -38,7 +39,7 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
     private ResourceInfo resourceInfo;
 
     public static final String HEADER_PROPERTY_ID = "id";
-    public static final String AUTHORIZATION_PROPERTY = "x-access-token";
+    public static final String AUTHORIZATION_PROPERTY = "Authorization";
 
     // Do not use static responses, rebuild reponses every time
     private static final String ACCESS_REFRESH = "Token expired. Please authenticate again!";
@@ -46,22 +47,24 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
     private static final String ACCESS_DENIED = "Not allowed to access this resource!";
     private static final String ACCESS_FORBIDDEN = "Access forbidden!";
 
+
     public AuthenticationFilter(ResourceInfo resourceInfo) {
         super();
         this.resourceInfo = resourceInfo;
+
     }
 
 
     @Override
     public void filter( ContainerRequestContext requestContext )
     {
-        logger.debug("GOT HERE");
+
         Method method = resourceInfo.getResourceMethod();
         // everybody can access (e.g. user/create or user/authenticate)
         if( !method.isAnnotationPresent( PermitAll.class ) )
         {
 
-            logger.debug("IS NOT PERMITALL");
+
             // nobody can access
             if( method.isAnnotationPresent( DenyAll.class ) )
             {
@@ -73,10 +76,15 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
 
             // get request headers to extract jwt token
             final MultivaluedMap<String, String> headers = requestContext.getHeaders();
-            final List<String> authProperty = headers.get( AUTHORIZATION_PROPERTY );
+            //final List<String> authProperty = headers.get( AUTHORIZATION_PROPERTY );
+
+            String authProperty
+                    = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+
+
 
             // block access if no authorization information is provided
-            if( authProperty == null || authProperty.isEmpty() )
+            if( authProperty == null || authProperty.isEmpty() || !authProperty.startsWith("Bearer"))
             {
                 logger.warn("No token provided!");
                 requestContext.abortWith(
@@ -86,7 +94,7 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
             }
 
             String id = null ;
-            String jwt = authProperty.get(0);
+            String jwt = authProperty.substring("Bearer".length()).trim();
 
             // try to decode the jwt - deny access if no valid token provided
             try {

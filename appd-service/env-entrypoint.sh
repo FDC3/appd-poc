@@ -11,7 +11,7 @@ fi
 # Load the S3 secrets file contents into the environment variables
 eval $(aws s3 cp s3://${BUCKET_NAME}/env/env.txt - | sed 's/^/export /')
 
-aws s3 cp s3://${BUCKET_NAME}/conf/ /opt/mtm-bot/conf --recursive
+aws s3 cp s3://${BUCKET_NAME}/conf/ /opt/appd-service/conf --recursive
 aws s3 cp s3://${BUCKET_NAME}/certs/ /opt/certs --recursive
 
 ##Copy host overrides

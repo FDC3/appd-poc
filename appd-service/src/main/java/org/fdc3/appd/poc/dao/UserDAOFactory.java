@@ -23,11 +23,11 @@ import org.fdc3.appd.poc.config.Configuration;
 
 public class UserDAOFactory {
 	Configuration config = Configuration.get();
+	private static UserDAO userDAO = new UserS3DAO();
 
     public static UserDAO getUserDAO() {
 
-
-        return new UserS3DAO();
+        return userDAO;
 
     }
 }

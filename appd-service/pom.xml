@@ -158,7 +158,7 @@
                     <assembleDirectory>${project.build.directory}/appd-service/appd-service-${version.minor}
                     </assembleDirectory>
                     <!-- Extra JVM arguments that will be included in the bin scripts -->
-                    <extraJvmArguments>-Xms128m -Xmx512m -Dlogback.configurationFile=/opt/appd-service/conf/logback.xml
+                    <extraJvmArguments>-Xms128m -Xmx256m -Dlogback.configurationFile=/opt/appd-service/conf/logback.xml
                         -Dwar.file="$BASEDIR/lib/appd-service-${version}.war"
                     </extraJvmArguments>
                     <!-- Generate bin scripts for windows and unix pr default -->

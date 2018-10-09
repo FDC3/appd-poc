@@ -49,6 +49,7 @@ public class AppsDAO {
     private Configuration config = Configuration.get();
 
     private Logger logger = LoggerFactory.getLogger(AppsDAO.class);
+    AwsS3Client awsS3Client = new AwsS3Client();
 
 
     public AppsDAO() {
@@ -197,13 +198,13 @@ public class AppsDAO {
      */
     private void primeFromS3() {
 
-        AwsS3Client awsS3Client = new AwsS3Client();
+        //AwsS3Client awsS3Client = new AwsS3Client();
 
 
         Gson gson = new Gson();
 
-        logger.debug("Attempting to load cache from S3 [{}/{}]", config.get(ConfigId.S3_BUCKET), config.get(ConfigId.S3_JSON_PREFIX));
-        List<S3ObjectSummary> allObjects = awsS3Client.getAllObjects(config.get(ConfigId.S3_BUCKET, ""), config.get(ConfigId.S3_JSON_PREFIX, "json"));
+        logger.debug("Attempting to load cache from S3 [{}/{}]", config.get(ConfigId.S3_BUCKET), config.get(ConfigId.S3_JSON_APPS_PREFIX));
+        List<S3ObjectSummary> allObjects = awsS3Client.getAllObjects(config.get(ConfigId.S3_BUCKET, ""), config.get(ConfigId.S3_JSON_APPS_PREFIX, "json"));
 
         if (allObjects != null) {
             for (S3ObjectSummary objectSummary : allObjects) {
@@ -212,7 +213,12 @@ public class AppsDAO {
                     continue;
 
                 Application application = gson.fromJson(new InputStreamReader(awsS3Client.getObject(objectSummary)), Application.class);
-                apps.put(application.getAppId(), application);
+
+                if(application.getAppId() != null) {
+                    apps.put(application.getAppId(), application);
+                }else{
+                    logger.error("Could not prime the following object [{}]",objectSummary.getKey());
+                }
 
 
             }
@@ -249,10 +255,10 @@ public class AppsDAO {
 
             if (config.getBoolean(ConfigId.S3_ENABLED, false)) {
 
-                AwsS3Client awsS3Client = new AwsS3Client();
+                //AwsS3Client awsS3Client = new AwsS3Client();
                 awsS3Client.putObject(
                         config.get(ConfigId.S3_BUCKET, ""),
-                        Paths.get(config.get(ConfigId.S3_JSON_PREFIX, ""),fileName).toString(),
+                        Paths.get(config.get(ConfigId.S3_JSON_APPS_PREFIX, ""),fileName).toString(),
                         new ByteArrayInputStream(gson.toJson(application).getBytes(StandardCharsets.UTF_8)),
                         null);
 

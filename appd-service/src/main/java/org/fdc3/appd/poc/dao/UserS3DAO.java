@@ -54,6 +54,7 @@ public class UserS3DAO implements UserDAO {
     private Configuration config = Configuration.get();
     private Logger logger = LoggerFactory.getLogger(UserS3DAO.class);
     private ConcurrentMap<String, UserSecurity> users = new ConcurrentHashMap<>();
+    private AwsS3Client awsS3Client = new AwsS3Client();
 
     //PreLoad all users from cache
     {
@@ -242,7 +243,7 @@ public class UserS3DAO implements UserDAO {
     private void preLoad() {
 
         try {
-            AwsS3Client awsS3Client = new AwsS3Client();
+          //  AwsS3Client awsS3Client = new AwsS3Client();
 
             Gson gson = new Gson();
 
@@ -281,7 +282,7 @@ public class UserS3DAO implements UserDAO {
         try {
             if (config.getBoolean(ConfigId.S3_ENABLED, false)) {
 
-                AwsS3Client awsS3Client = new AwsS3Client();
+              //  AwsS3Client awsS3Client = new AwsS3Client();
                 awsS3Client.putObject(
                         config.get(ConfigId.S3_BUCKET, ""),
                         Paths.get(config.get(ConfigId.S3_JSON_USERS_PREFIX, ""), userSecurity.getId() + ".json").toString(),

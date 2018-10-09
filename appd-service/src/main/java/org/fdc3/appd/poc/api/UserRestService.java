@@ -115,8 +115,8 @@ public class UserRestService  {
 
 
             // Return the token on the response
-           // return Response.status(Response.Status.OK).entity(new Gson().toJsonTree(map)).build();
-            return Response.status(Response.Status.OK).entity(token).build();
+            return Response.status(Response.Status.OK).entity(new Gson().toJson(map)).build();
+            //return Response.status(Response.Status.OK).entity().build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (Exception e) {
@@ -124,6 +124,23 @@ public class UserRestService  {
         }
 
     }
+
+
+    @GET
+    @Path("/healthcheck")
+    @PermitAll
+    @Produces("application/json")
+    public Response healthCheck(@Context HttpHeaders headers) {
+
+        try {
+
+            return Response.status(Response.Status.OK).entity("HEALTH OK").build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        }
+    }
+
 
     @GET
     @Path("/get")

@@ -31,7 +31,7 @@ import org.jose4j.lang.JoseException;
 public class TokenSecurity {
 	
 	private static RsaJsonWebKey rsaJsonWebKey = null;
-	private static String issuer = "tutorial-academy.com";
+	private static String issuer = "fdc3.org";
 	private static int timeToExpire = 30;
 	
 	// 	Generate an RSA key pair, which will be used for signing and verification of the JWT, wrapped in a JWK
