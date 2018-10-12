@@ -5,6 +5,7 @@ import org.fdc3.appd.poc.dao.UserDAOFactory;
 import org.fdc3.appd.poc.exceptions.UserNotFoundException;
 import org.fdc3.appd.poc.model.User;
 import org.fdc3.appd.poc.model.UserSecurity;
+import org.fdc3.appd.poc.security.AppdSecurityContext;
 import org.fdc3.appd.poc.security.TokenSecurity;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
@@ -41,11 +42,13 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
     public static final String HEADER_PROPERTY_ID = "id";
     public static final String AUTHORIZATION_PROPERTY = "Authorization";
 
+
     // Do not use static responses, rebuild reponses every time
     private static final String ACCESS_REFRESH = "Token expired. Please authenticate again!";
     private static final String ACCESS_INVALID_TOKEN = "Token invalid. Please authenticate again!";
     private static final String ACCESS_DENIED = "Not allowed to access this resource!";
     private static final String ACCESS_FORBIDDEN = "Access forbidden!";
+
 
 
     public AuthenticationFilter(ResourceInfo resourceInfo) {
@@ -154,6 +157,12 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
             List<String> idList = new ArrayList<String>();
             idList.add( id );
             headers.put( HEADER_PROPERTY_ID, idList );
+
+
+            String scheme = requestContext.getUriInfo().getRequestUri().getScheme();
+            requestContext.setSecurityContext(new AppdSecurityContext(userSecurity, scheme));
+
+
         }
     }
 

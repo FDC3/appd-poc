@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import org.fdc3.appd.poc.config.ConfigId;
 import org.fdc3.appd.poc.config.Configuration;
 import org.fdc3.appd.poc.exceptions.DaoException;
+import org.fdc3.appd.poc.model.UserSecurity;
 import org.fdc3.appd.poc.util.AwsS3Client;
 import org.fdc3.appd.server.model.Application;
 import org.slf4j.Logger;

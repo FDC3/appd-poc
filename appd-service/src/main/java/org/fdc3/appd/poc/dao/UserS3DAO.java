@@ -206,7 +206,7 @@ public class UserS3DAO implements UserDAO {
     public boolean updateUser(User user) throws UserNotFoundException {
 
 
-        if (user == null || user.getEmail() == null || user.getFirstname() == null || user.getLastname() == null) {
+        if (user == null || user.getEmail() == null || user.getFirstname() == null || user.getLastname() == null || user.getCompany() == null) {
             logger.error("Insufficient attributes to update new user");
             return false;
 
@@ -225,6 +225,9 @@ public class UserS3DAO implements UserDAO {
 
         if (user.getFirstname() != null)
             userSecurity.setFirstname(user.getFirstname());
+
+        if(user.getCompany() != null)
+            userSecurity.setCompany(user.getCompany());
 
 
         return deepUpdateUser(userSecurity);

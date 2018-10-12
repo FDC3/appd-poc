@@ -52,7 +52,7 @@ public class UserSecurity extends User {
 
 	@Override
 	public String toString() {
-		return "UserSecurity [id="+ this.getId() + ", email=" + this.getEmail() + ", role=" + role + ", password=" + password + ", token=" + token + "]";
+		return "UserSecurity [id="+ this.getId() + ", email=" + this.getEmail() + ", role=" + role + ", company=" + this.getCompany() + ", password=###, token=####]";
 	}
 
 }

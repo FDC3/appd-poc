@@ -18,13 +18,17 @@
 
 package org.fdc3.appd.poc.model;
 
-public class User  {
+import java.security.Principal;
+
+public class User implements Principal {
 	
 	// global unique identifier
 	private String id = null;
 	private String email = null;
 	private String firstname = null;
 	private String lastname = null;
+	private String company = null;
+	private String name = null;
 
 	public User() {}
 	
@@ -34,11 +38,12 @@ public class User  {
 		this.lastname = lastname;
 	}
 	
-	public User( String id, String email, String firstname, String lastname ) {	
+	public User( String id, String email, String firstname, String lastname, String company ) {
 		this.id = id;
 		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
+		this.company = company;
 	}
 
 	public String getId() {
@@ -73,10 +78,29 @@ public class User  {
 		this.lastname = lastname;
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", firstname=" + firstname + ", lastname=" + lastname + "]";
+	public String getCompany() {
+		return company;
 	}
 
-	
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name){
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", email=" + email + ", firstname=" + firstname + ", lastname=" + lastname + ", company=" + company + "]";
+	}
+
+
+
+
 }
