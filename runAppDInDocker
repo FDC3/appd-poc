@@ -1,0 +1,15 @@
+#!/bin/sh -x
+
+echo "Building the appd-poc project...."
+mvn clean install 
+
+cd appd-service
+
+echo "Removing old container for appd-poc"
+docker rm appd-poc
+
+echo "Building docker image with tag appd-poc"
+docker build --tag appd-poc:master -f Dockerfile .
+
+echo "Attempting to start appd-poc container.  Note: default port: 8080, option to mount -v (local json dir):/json"
+docker run -it -d -p 8080:8080 appd-poc-master

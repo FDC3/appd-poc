@@ -27,16 +27,17 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>appd-service/target/appd-service-0.0.1</directory>
+            <directory>target/appd-service/appd-service-0.0.1</directory>
             <outputDirectory></outputDirectory>
         </fileSet>
     </fileSets>
     <files>
         <file>
-            <source>appd-service/target/appd-service-classes.jar</source>
-            <outputDirectory>lib</outputDirectory>
+            <source>target/appd-service-classes.jar</source>
+            <outputDirectory>/lib</outputDirectory>
         </file>
     </files>
+
 </assembly>
 
 

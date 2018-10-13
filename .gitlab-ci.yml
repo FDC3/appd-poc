@@ -2,7 +2,7 @@ image: docker-registry-eu.mdevlab.com/images/maven-builder:master
 
 default-job:
   script:
-     - ./buildIt
+     - ./runAppdInDocker
 
 
 

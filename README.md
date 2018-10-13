@@ -21,7 +21,7 @@ Build:
 
     #git clone..*:
     #cd cloned_directory
-    #mvn clean install package
+    #mvn clean install
 
 
 ## Directory structure
@@ -32,27 +32,26 @@ Build:
 
 
 ## Run it in Docker!
+The default listening port will be 8080.
+
+Consider mounting a local filesystem to /json (-v (local_json_dir):/json) to recover json data.
 
     # clone..*
     # cd cloned_directory
-    # mvn clean install package
-    # cd appd-service
-    # docker build . --tag=appd-service
-    # docker run -p 8080:8080 appd-service
+    # ./runAppDInDocker
 
-    # curl http://localhost:8080/appd/v1/apps/search
-    {"applications":[{"appId":"353527c7-f765-452b-a5d4-a1ecaa0854f7","name":"TEST IT","appType":"string","version":"string","title":"string","tooltip":"string","description":"string","images":[{"url":"string"}],"contactEmail":"string","supportEmail":"string","publisher":"string","icons":[{"icon":"string"}],"customConfig":[{"name":"string","value":"string"}],"intents":[{"name":"string"}],"appDetails":{"name":"string","aType":"string"}}],"message":"OK"}
 
 
 ## Altering Configuration
 Configuration can be provided through system properties, property file or environment variables.
 The "Configuration" system will search in the same order.  The following are configurations properties
-that can be set.
+that can be set.  Note: all serialized files will be written to local disk regardless of S3 configuration.
 
 | Property |  ENV Name | default | Description |
 | -------- | -------- | ------ | ----------- |
 | config.file | CONFIG_FILE | NONE | Configuration properties file to load at startup. Not required to run |
-| json.files | JSON_FILE | "json" | Directory to store all local json files |
+| json.user.files | JSON_USER_FILE | "json/users" | Directory to store serialized user json files |
+| json.user.files | JSON_USER_FILE | "json/apps" | Directory to store serialized application json files |
 | war.file | WAR_FILE | "lib/appd-service.war" | War file for AppD POD Service |
 | http.port | HTTP_PORT | "8080" | Default interface listening port |
 | s3.enabled | S3_ENABLED | "false" | Enable AWS S3 support |
@@ -61,3 +60,5 @@ that can be set.
 | s3.region | S3_REGION | "us-east-1" | AWS region to use |
 | s3.bucket | S3_BUCKET | NONE | S3 bucket name (do not prefix with s3:// ) |
 | s3.json.prefix | S3_JSON_PREFIX | NONE | Prefix to add to bucket where json files are stored |
+| s3.json.users.prefix | S3_JSON_USERS_PREFIX | "json/users" | Prefix to add to bucket name where serialized json user files are stored |
+| s3.json.apps.prefix | S3_JSON_APPS_PREFIX | "json/applications" |Prefix to add to bucket name where serialized application definitions are stored |
