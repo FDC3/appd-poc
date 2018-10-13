@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.fdc3.appd.poc.dao.AppsDAO;
+import org.fdc3.appd.poc.dao.AppsDAOFactory;
 import org.fdc3.appd.poc.exceptions.DaoException;
 import org.fdc3.appd.poc.model.UserSecurity;
 import org.fdc3.appd.server.api.NotFoundException;
@@ -42,7 +43,7 @@ import java.util.List;
  */
 public class AppDirectoryService extends V1ApiService {
 
-    private AppsDAO appsDao = AppsDAO.get();
+    private AppsDAO appsDAO = AppsDAOFactory.getAppsDAO();
 
     private Logger logger = LoggerFactory.getLogger(AppDirectoryService.class);
 
@@ -56,7 +57,7 @@ public class AppDirectoryService extends V1ApiService {
 
         try {
 
-            Application application = appsDao.getApp(appId);
+            Application application = appsDAO.getApp(appId);
 
 
             jo.add("application", gson.toJsonTree(application));
@@ -90,33 +91,32 @@ public class AppDirectoryService extends V1ApiService {
 
             //Check if publisher is same as requester
             if (!application.getPublisher().equalsIgnoreCase(userSecurity.getCompany())) {
-                jo.addProperty("message", "You are not administrator for company/publisher= " + application.getPublisher());
+                jo.addProperty("message", userSecurity.getEmail() + " is not administrator for company/publisher= " + application.getPublisher());
                 return Response.status(Response.Status.UNAUTHORIZED).entity(jo.toString()).build();
             }
 
 
-            Application tApp=null;
+            Application tApp = null;
 
             try {
-                 tApp = appsDao.getApp(application.getAppId());
-            }catch (DaoException e){
+                tApp = appsDAO.getApp(application.getAppId());
+            } catch (DaoException e) {
                 logger.debug("Application does not exist...");
             }
 
             //Check if existing and publisher/company match for update
-            if(tApp != null){
+            if (tApp != null) {
 
-                if(!tApp.getPublisher().equalsIgnoreCase(userSecurity.getCompany())){
-                    jo.addProperty("message", "Unable to update application.  You are not administrator for company/publisher= " + tApp.getPublisher());
+                if (!tApp.getPublisher().equalsIgnoreCase(userSecurity.getCompany())) {
+                    jo.addProperty("message", "Unable to update application. " + userSecurity.getEmail() + " is not the administrator for company/publisher= " + tApp.getPublisher());
                     return Response.status(Response.Status.UNAUTHORIZED).entity(jo.toString()).build();
                 }
             }
 
-                //upsert
-                appsDao.setApp(application);
-                jo.add("application", gson.toJsonTree(application));
-                jo.addProperty("message", "OK");
-
+            //upsert
+            appsDAO.setApp(application);
+            jo.add("application", gson.toJsonTree(application));
+            jo.addProperty("message", "OK");
 
 
         } catch (DaoException e) {
@@ -141,7 +141,7 @@ public class AppDirectoryService extends V1ApiService {
 
         logger.debug("{}", userSecurity.toString());
 
-        List<Application> applications = new ArrayList<>(appsDao.getApps().values());
+        List<Application> applications = new ArrayList<>(appsDAO.getApps().values());
 
         jo.add("applications", gson.toJsonTree(applications));
         jo.addProperty("message", "OK");

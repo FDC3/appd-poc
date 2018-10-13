@@ -20,10 +20,11 @@ package org.fdc3.appd.poc.dao;
 
 
 import org.fdc3.appd.poc.config.Configuration;
+import org.fdc3.appd.poc.dao.impl.UserDAOImpl;
 
 public class UserDAOFactory {
 	Configuration config = Configuration.get();
-	private static UserDAO userDAO = new UserS3DAO();
+	private static UserDAO userDAO = new UserDAOImpl();
 
     public static UserDAO getUserDAO() {
 

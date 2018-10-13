@@ -16,12 +16,13 @@
  *  from IHS Markit.
  */
 
-package org.fdc3.appd.poc.dao;
+package org.fdc3.appd.poc.dao.impl;
 
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.gson.Gson;
 import org.fdc3.appd.poc.config.ConfigId;
 import org.fdc3.appd.poc.config.Configuration;
+import org.fdc3.appd.poc.dao.UserDAO;
 import org.fdc3.appd.poc.exceptions.UserExistingException;
 import org.fdc3.appd.poc.exceptions.UserNotFoundException;
 import org.fdc3.appd.poc.model.User;
@@ -30,8 +31,7 @@ import org.fdc3.appd.poc.util.AwsS3Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,25 +42,30 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Manage all user object access and persist through S3.
  * <p>
- * This DAO will preLoad all known users from S3 upon access and maintain cache from that point forward.
+ * This DAO will prime all known users from S3 upon access and maintain cache from that point forward.
  * <p>
  * Currently, this does not support lazy loading.
  *
  * @author Frank Tarsillo on 8/28/18.
  */
-public class UserS3DAO implements UserDAO {
+public class UserDAOImpl implements UserDAO {
 
 
     private Configuration config = Configuration.get();
-    private Logger logger = LoggerFactory.getLogger(UserS3DAO.class);
+    private Logger logger = LoggerFactory.getLogger(UserDAOImpl.class);
     private ConcurrentMap<String, UserSecurity> users = new ConcurrentHashMap<>();
-    private AwsS3Client awsS3Client = new AwsS3Client();
+    private String directory = config.get(ConfigId.JSON_USERS_DIR, "json/users");
+    private AwsS3Client awsS3Client;
 
-    //PreLoad all users from cache
-    {
-        preLoad();
+
+    public UserDAOImpl() {
+
+        //Init S3 client
+        if (config.getBoolean(ConfigId.S3_ENABLED, false))
+            awsS3Client = new AwsS3Client();
+
+        prime();
     }
-
 
     /**
      * Create a new user if one doesn't already exist.
@@ -197,6 +202,7 @@ public class UserS3DAO implements UserDAO {
 
     /**
      * Update user attributes without security context
+     *
      * @param user User defintion
      * @return True if updated
      * @throws UserNotFoundException User not found
@@ -226,7 +232,7 @@ public class UserS3DAO implements UserDAO {
         if (user.getFirstname() != null)
             userSecurity.setFirstname(user.getFirstname());
 
-        if(user.getCompany() != null)
+        if (user.getCompany() != null)
             userSecurity.setCompany(user.getCompany());
 
 
@@ -240,29 +246,63 @@ public class UserS3DAO implements UserDAO {
 
 
     /**
-     * Pre-load all users from S3 into cache
-     *
+     * Pre-load all users from local files and S3 into cache
      */
-    private void preLoad() {
+    private void prime() {
 
         try {
-          //  AwsS3Client awsS3Client = new AwsS3Client();
 
             Gson gson = new Gson();
 
-            logger.debug("Attempting to load cache from S3 [{}/{}]", config.get(ConfigId.S3_BUCKET), config.get(ConfigId.S3_JSON_USERS_PREFIX));
-            List<S3ObjectSummary> allObjects = awsS3Client.getAllObjects(config.get(ConfigId.S3_BUCKET, ""), config.get(ConfigId.S3_JSON_USERS_PREFIX, "json"));
 
-            if (allObjects != null) {
-                for (S3ObjectSummary objectSummary : allObjects) {
+            File dir = new File(directory);
 
-                    if (!objectSummary.getKey().contains(".json"))
-                        continue;
-
-                    UserSecurity user = gson.fromJson(new InputStreamReader(awsS3Client.getObject(objectSummary)), UserSecurity.class);
-                    users.put(user.getId(), user);
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    logger.error("Could not initialize json directory {}", directory);
+                }
+            }
 
 
+            File[] files = dir.listFiles();
+
+            if (files == null) {
+                logger.error("Failed to load locate directory [{}] for json pre-load..exiting", directory);
+                System.exit(1);
+            }
+
+
+            for (File file : files) {
+
+                if (!file.getName().contains(".json"))
+                    continue;
+
+                logger.info("Loading user data from file [{}]", file.getName());
+                try {
+                    UserSecurity userSecurity = gson.fromJson(new FileReader(file), UserSecurity.class);
+                    users.put(userSecurity.getId(), userSecurity);
+
+                } catch (IOException e) {
+                    logger.error("Could not load user from json file {} ", file.getName(), e);
+                }
+            }
+
+
+            if (config.getBoolean(ConfigId.S3_ENABLED, false)) {
+                logger.debug("Attempting to load cache from S3 [{}/{}]", config.get(ConfigId.S3_BUCKET), config.get(ConfigId.S3_JSON_USERS_PREFIX));
+                List<S3ObjectSummary> allObjects = awsS3Client.getAllObjects(config.get(ConfigId.S3_BUCKET, ""), config.get(ConfigId.S3_JSON_USERS_PREFIX, "json"));
+
+                if (allObjects != null) {
+                    for (S3ObjectSummary objectSummary : allObjects) {
+
+                        if (!objectSummary.getKey().contains(".json"))
+                            continue;
+
+                        UserSecurity user = gson.fromJson(new InputStreamReader(awsS3Client.getObject(objectSummary)), UserSecurity.class);
+                        users.put(user.getId(), user);
+
+
+                    }
                 }
             }
         } catch (Exception e) {
@@ -274,6 +314,7 @@ public class UserS3DAO implements UserDAO {
 
     /**
      * Update user with security context updating both cache and persist (S3)
+     *
      * @param userSecurity User with security context
      * @return True if user updated to persist
      */
@@ -282,23 +323,38 @@ public class UserS3DAO implements UserDAO {
 
         Gson gson = new Gson();
 
+        String directory = config.get(ConfigId.JSON_USERS_DIR, "json/users");
+
+
+        String fileName = userSecurity.getId() + ".json";
+
+
         try {
-            if (config.getBoolean(ConfigId.S3_ENABLED, false)) {
+            FileWriter jsonFile = new FileWriter(Paths.get(directory, fileName).toString());
 
-              //  AwsS3Client awsS3Client = new AwsS3Client();
-                awsS3Client.putObject(
-                        config.get(ConfigId.S3_BUCKET, ""),
-                        Paths.get(config.get(ConfigId.S3_JSON_USERS_PREFIX, ""), userSecurity.getId() + ".json").toString(),
-                        new ByteArrayInputStream(gson.toJson(userSecurity).getBytes(StandardCharsets.UTF_8)),
-                        null);
-            }
 
-            users.putIfAbsent(userSecurity.getId(), userSecurity);
-            return true;
-        } catch (Exception e) {
-            logger.error("S3 Exception writing user file for {}", userSecurity.getEmail(), e);
+            gson.toJson(userSecurity, jsonFile);
+            jsonFile.flush();
+            jsonFile.close();
+
+        } catch (IOException e) {
+            logger.error("Could not write user file [{}] to disk for {}", fileName, userSecurity.getEmail(), e);
+            return false;
         }
 
-        return false;
+
+        if (config.getBoolean(ConfigId.S3_ENABLED, false)) {
+
+            //  AwsS3Client awsS3Client = new AwsS3Client();
+            awsS3Client.putObject(
+                    config.get(ConfigId.S3_BUCKET, ""),
+                    Paths.get(config.get(ConfigId.S3_JSON_USERS_PREFIX, ""), userSecurity.getId() + ".json").toString(),
+                    new ByteArrayInputStream(gson.toJson(userSecurity).getBytes(StandardCharsets.UTF_8)),
+                    null);
+        }
+
+        users.put(userSecurity.getId(), userSecurity);
+        return true;
     }
+
 }

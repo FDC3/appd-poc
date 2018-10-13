@@ -18,28 +18,17 @@
 
 package org.fdc3.appd.poc.dao;
 
-import org.fdc3.appd.poc.exceptions.DaoException;
-import org.fdc3.appd.server.model.Application;
 
-import java.util.concurrent.ConcurrentMap;
+import org.fdc3.appd.poc.config.Configuration;
+import org.fdc3.appd.poc.dao.impl.AppsDAOImpl;
 
-/**
- * @author Frank Tarsillo on 10/12/18.
- */
-public interface AppsDAO {
-    /**
-     * Obtain a singleton instance.  This will also create cache from persist on first call
-     *
-     * @return instance
-     */
+public class AppsDAOFactory {
+	Configuration config = Configuration.get();
+	private static AppsDAO appsDAO = new AppsDAOImpl();
 
-    ConcurrentMap<String, Application> getApps();
+    public static AppsDAO getAppsDAO() {
 
-    void setApps(ConcurrentMap<String, Application> apps);
+        return appsDAO;
 
-    Application getApp(String appId) throws DaoException;
-
-    void setApp(Application application) throws DaoException;
-
-    void prime();
+    }
 }
