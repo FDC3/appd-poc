@@ -47,7 +47,7 @@ public class AppsDAOImpl implements org.fdc3.appd.poc.dao.AppsDAO {
 
     private ConcurrentMap<String, Application> apps = new ConcurrentHashMap<>();
     private Configuration config = Configuration.get();
-    private String directory = config.get(ConfigId.JSON_APPLICATION_DIR, "json/apps");
+    private String directory = config.get(ConfigId.JSON_APPS_DIR, "json/apps");
 
     private Logger logger = LoggerFactory.getLogger(AppsDAOImpl.class);
     private AwsS3Client awsS3Client;

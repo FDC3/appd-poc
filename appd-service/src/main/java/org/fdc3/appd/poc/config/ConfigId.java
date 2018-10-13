@@ -39,7 +39,7 @@ public enum ConfigId {
     HTTP_CONTEXT_PATH(false),
     HTTP_PORT(false),
     JSON_USERS_DIR(false),
-    JSON_APPLICATION_DIR(false);
+    JSON_APPS_DIR(false);
 
 
 

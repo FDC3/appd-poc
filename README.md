@@ -50,8 +50,8 @@ that can be set.  Note: all serialized files will be written to local disk regar
 | Property |  ENV Name | default | Description |
 | -------- | -------- | ------ | ----------- |
 | config.file | CONFIG_FILE | NONE | Configuration properties file to load at startup. Not required to run |
-| json.user.files | JSON_USER_FILE | "json/users" | Directory to store serialized user json files |
-| json.user.files | JSON_USER_FILE | "json/apps" | Directory to store serialized application json files |
+| json.users.dir | JSON_USERS_DIR | "json/users" | Directory to store serialized user json files |
+| json.apps.dir | JSON_APPS_DIR | "json/apps" | Directory to store serialized application json files |
 | war.file | WAR_FILE | "lib/appd-service.war" | War file for AppD POD Service |
 | http.port | HTTP_PORT | "8080" | Default interface listening port |
 | s3.enabled | S3_ENABLED | "false" | Enable AWS S3 support |
