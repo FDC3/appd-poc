@@ -6,6 +6,7 @@ mvn clean install
 cd appd-service
 
 echo "Removing old container for appd-poc"
+docker stop appd-poc
 docker rm appd-poc
 
 echo "Building docker image with tag appd-poc"
