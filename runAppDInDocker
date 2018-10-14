@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 echo "Building the appd-poc project...."
-mvn clean install
+./make
 
 cd appd-service
 
