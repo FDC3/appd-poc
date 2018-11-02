@@ -21,7 +21,7 @@ Build:
 
     #git clone..*:
     #cd cloned_directory
-    #mvn clean install
+    #./make
 
 
 ## Directory structure

@@ -22,7 +22,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>appd-poc</artifactId>
-        <groupId>org.fdc3.appd</groupId>
+        <groupId>org.finos.fdc3.appd</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -52,7 +52,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.fdc3.appd</groupId>
+            <groupId>org.finos.fdc3.appd</groupId>
             <artifactId>appd-java-server-stubs</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -88,6 +88,16 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>${aws-sdk-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2-servlet-initializer</artifactId>
+            <version>2.0.5</version>
         </dependency>
 
     </dependencies>

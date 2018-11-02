@@ -31,8 +31,7 @@
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>
-                io.swagger.jaxrs.listing,
-                io.swagger.sample.resource,
+                io.swagger.v3.jaxrs2.integration.resources,
                 org.fdc3.appd.server.api,
                 org.fdc3.appd.poc.config,
                 org.fdc3.appd.poc.api

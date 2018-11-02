@@ -1,0 +1,127 @@
+openapi: 3.0.1
+paths:
+  /user/get:
+    get:
+      operationId: get
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /user/update:
+    post:
+      operationId: update
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /user/delete:
+    delete:
+      operationId: delete
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /user/healthcheck:
+    get:
+      operationId: healthCheck
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /user/create:
+    post:
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSecurity'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /user/authenticate:
+    post:
+      operationId: authenticate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /user/getAll:
+    get:
+      operationId: getAll
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+
+components:
+  schemas:
+    NameValuePair:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        company:
+          type: string
+        name:
+          type: string
+    UserSecurity:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        company:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        token:
+          type: string
+        role:
+          type: string
+
+    Credentials:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
