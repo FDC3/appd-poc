@@ -9,7 +9,7 @@ This project is a POC focused on creation of an Application Directory service as
 ongoing discussions in the Application Directory FDC3 working group.  The purpose of this POC is to:
 
 * Evaluate discoverability of the service through application identification
-* Implementation of the [Application Directory API](https://github.com/FDC3/appd-api)
+* Implementation of the [Application Directory API](https://github.com/FDC3/appd-api) .  Please see [full specification](https://fdc3-app-directory.finos.org/) .
 * Support general demonstrations
 
 
